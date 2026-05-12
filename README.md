@@ -3,6 +3,15 @@
   <img width="100%" alt="Labless Welcome Screen" src="Images/WelcomeScreen.png" />
 </p>
 
+<p align="center">
+  <br>
+  <a href="https://github.com/DevRanbir/Labless/releases/tag/v2-beta">
+    <img width="80%" src="https://img.shields.io/badge/Download_v2--beta-2ea44f?style=for-the-badge&logo=github&logoColor=white&labelColor=00C7B7" alt="Download v2-beta">
+  </a>
+  <br>
+</p>
+
+
 # 🚀 Labless
 
 > AI-powered intelligent email labeling and organization platform designed to automate your inbox workflow and eliminate manual sorting.
