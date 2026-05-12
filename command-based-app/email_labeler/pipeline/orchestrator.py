@@ -1,0 +1,351 @@
+"""Main pipeline orchestrator for the ETL pipeline."""
+
+import logging
+from collections import OrderedDict
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+from ..database import EmailDatabase
+from ..email_processor import EmailProcessor
+from ..llm_service import LLMService
+from ..metrics import MetricsTracker
+from .base import PipelineContext, PipelineRun, PipelineStage
+from .config import PipelineConfig
+from .extract_stage import ExtractStage
+from .load_stage import LoadStage
+from .sync_stage import SyncStage
+from .transform_stage import TransformStage
+
+logger = logging.getLogger(__name__)
+
+
+class EmailPipeline:
+    """Main orchestrator for the email processing ETL pipeline."""
+
+    def __init__(
+        self,
+        config: PipelineConfig,
+        email_processor: Optional[EmailProcessor] = None,
+        database: Optional[EmailDatabase] = None,
+        llm_service: Optional[LLMService] = None,
+        metrics_tracker: Optional[MetricsTracker] = None,
+    ):
+        """Initialize the pipeline with configuration.
+
+        Args:
+            config: Pipeline configuration.
+            email_processor: Optional shared EmailProcessor instance.
+            database: Optional shared EmailDatabase instance.
+            llm_service: Optional shared LLMService instance.
+            metrics_tracker: Optional shared MetricsTracker instance.
+        """
+        self.config = config
+        self.stages: OrderedDict[str, PipelineStage] = OrderedDict()
+
+        # Store shared dependencies
+        self.email_processor = email_processor
+        self.database = database
+        self.llm_service = llm_service
+        self.metrics_tracker = metrics_tracker
+
+        # Initialize default stages
+        self._initialize_default_stages()
+
+        # Configure logging
+        self._configure_logging()
+
+    def _initialize_default_stages(self):
+        """Initialize the default pipeline stages with dependency injection."""
+        # Create shared dependencies if not provided
+        if self.email_processor is None:
+            self.email_processor = EmailProcessor(lazy_init=True)
+        if self.database is None:
+            self.database = EmailDatabase()
+        if self.llm_service is None:
+            self.llm_service = LLMService(
+                categories=self.config.transform.categories,
+                max_content_length=self.config.transform.max_content_length,
+                model=self.config.transform.model,
+                service=self.config.transform.llm_service,
+                system_prompt=self.config.transform.system_prompt,
+                user_prompt=self.config.transform.user_prompt,
+                lazy_init=True,
+            )
+        if self.metrics_tracker is None:
+            self.metrics_tracker = MetricsTracker()
+
+        # Initialize stages with shared dependencies
+        self.stages["extract"] = ExtractStage(
+            self.config.extract, email_processor=self.email_processor, database=self.database
+        )
+        self.stages["transform"] = TransformStage(
+            self.config.transform,
+            llm_service=self.llm_service,
+            email_processor=self.email_processor,
+        )
+        self.stages["load"] = LoadStage(self.config.load, email_processor=self.email_processor)
+        self.stages["sync"] = SyncStage(
+            self.config.sync, database=self.database, metrics_tracker=self.metrics_tracker
+        )
+
+        logger.info(f"Initialized pipeline with {len(self.stages)} stages")
+
+    def _configure_logging(self):
+        """Configure logging based on monitoring config."""
+        log_level = getattr(logging, self.config.monitoring.log_level.upper(), logging.INFO)
+        logging.basicConfig(
+            level=log_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
+
+    def add_stage(
+        self,
+        name: str,
+        stage: PipelineStage,
+        after: Optional[str] = None,
+        before: Optional[str] = None,
+    ):
+        """Add a custom stage to the pipeline."""
+        if after and before:
+            raise ValueError("Cannot specify both 'after' and 'before'")
+
+        if after:
+            if after not in self.stages:
+                raise ValueError(f"Stage '{after}' not found")
+            # Insert after the specified stage
+            items = list(self.stages.items())
+            index = next(i for i, (k, v) in enumerate(items) if k == after) + 1
+            items.insert(index, (name, stage))
+            self.stages = OrderedDict(items)
+
+        elif before:
+            if before not in self.stages:
+                raise ValueError(f"Stage '{before}' not found")
+            # Insert before the specified stage
+            items = list(self.stages.items())
+            index = next(i for i, (k, v) in enumerate(items) if k == before)
+            items.insert(index, (name, stage))
+            self.stages = OrderedDict(items)
+
+        else:
+            # Add at the end
+            self.stages[name] = stage
+
+        logger.info(f"Added stage '{name}' to pipeline")
+
+    def remove_stage(self, name: str):
+        """Remove a stage from the pipeline."""
+        if name not in self.stages:
+            raise ValueError(f"Stage '{name}' not found")
+
+        del self.stages[name]
+        logger.info(f"Removed stage '{name}' from pipeline")
+
+    def run(
+        self, dry_run: Optional[bool] = None, preview_mode: bool = False, test_mode: bool = False,
+        save_every: int = 10,
+    ) -> PipelineRun:
+        """Execute the complete pipeline.
+
+        Args:
+            dry_run: If True, no changes are made to Gmail.
+            preview_mode: If True, show what would be done.
+            test_mode: If True, use mock data.
+            save_every: After every this many emails are transformed, immediately
+                        run the load + sync stages so labels are applied to Gmail
+                        incrementally.  Defaults to 10.
+        """
+        # Use config dry_run if not specified
+        if dry_run is None:
+            dry_run = self.config.dry_run
+
+        # Create pipeline context
+        context = PipelineContext.create(
+            config=self.config, dry_run=dry_run, preview_mode=preview_mode, test_mode=test_mode
+        )
+
+        logger.info(f"Starting pipeline run {context.run_id}")
+        if dry_run:
+            logger.info("Running in DRY RUN mode - no changes will be made")
+        if preview_mode:
+            logger.info("Running in PREVIEW mode - showing what would be done")
+        if test_mode:
+            logger.info("Running in TEST mode - using mock data")
+
+        start_time = datetime.now()
+        stages_completed = []
+        data = None
+
+        try:
+            # ----------------------------------------------------------------
+            # Extract
+            # ----------------------------------------------------------------
+            extract_stage = self.stages.get("extract")
+            if extract_stage is None:
+                raise RuntimeError("No 'extract' stage configured")
+
+            logger.info("Executing stage: extract")
+            stage_start = datetime.now()
+
+            if not extract_stage.validate_input(None):
+                raise ValueError("Invalid input for stage 'extract'")
+
+            all_emails = extract_stage.execute(None, context)
+            stages_completed.append("extract")
+            stage_elapsed = (datetime.now() - stage_start).total_seconds()
+            context.add_metric("extract_time", stage_elapsed)
+            for key, value in extract_stage.get_metrics().items():
+                context.add_metric(f"extract_{key}", value)
+            logger.info(f"Stage 'extract' completed in {stage_elapsed:.2f}s")
+
+            if not all_emails:
+                logger.info("No emails extracted, stopping pipeline")
+                data = []
+            else:
+                # ----------------------------------------------------------------
+                # Transform → Load → Sync in micro-batches of `save_every` emails
+                # ----------------------------------------------------------------
+                transform_stage = self.stages.get("transform")
+                load_stage = self.stages.get("load")
+                sync_stage = self.stages.get("sync")
+
+                total = len(all_emails)
+                logger.info(
+                    f"Processing {total} emails in micro-batches of {save_every} "
+                    "(transform → load → sync per batch)"
+                )
+
+                all_results = []
+                for batch_start in range(0, total, save_every):
+                    batch = all_emails[batch_start: batch_start + save_every]
+                    batch_num = batch_start // save_every + 1
+                    logger.info(
+                        f"--- Micro-batch {batch_num}: emails {batch_start + 1}–"
+                        f"{min(batch_start + save_every, total)} of {total} ---"
+                    )
+
+                    # Transform
+                    if transform_stage:
+                        enriched = transform_stage.execute(batch, context)
+                    else:
+                        enriched = batch  # type: ignore[assignment]
+
+                    # Load (apply labels to Gmail)
+                    if load_stage and enriched:
+                        batch_results = load_stage.execute(enriched, context)
+                        all_results.extend(batch_results)
+                        logger.info(
+                            f"Micro-batch {batch_num}: applied labels to "
+                            f"{len(batch_results)} emails in Gmail"
+                        )
+                    else:
+                        batch_results = []
+
+                    # Sync (save to DB / metrics) — receives ActionResult list
+                    if sync_stage and batch_results:
+                        sync_stage.execute(batch_results, context)
+
+                # Mark all three stages as completed
+                for sname in ("transform", "load", "sync"):
+                    if sname in self.stages:
+                        stages_completed.append(sname)
+
+                data = all_results
+
+        except Exception as e:
+            logger.error(f"Pipeline failed: {e}")
+            context.add_error(f"Pipeline failed: {str(e)}")
+
+        finally:
+            end_time = datetime.now()
+            elapsed = (end_time - start_time).total_seconds()
+
+            # Create pipeline run result
+            run_result = self._create_run_result(context, start_time, end_time, stages_completed)
+
+            logger.info(f"Pipeline run {context.run_id} completed in {elapsed:.2f}s")
+            logger.info(f"Stages completed: {', '.join(stages_completed)}")
+            logger.info(f"Emails processed: {run_result.emails_processed}")
+            logger.info(f"Success rate: {run_result.successful}/{run_result.emails_processed}")
+
+            if context.errors:
+                logger.warning(f"Errors encountered: {len(context.errors)}")
+                for error in context.errors[:5]:  # Show first 5 errors
+                    logger.warning(f"  - {error}")
+
+            return run_result
+
+    def run_stage(self, stage_name: str, input_data: Any = None, dry_run: bool = False) -> Any:
+        """Run a single stage independently (for debugging)."""
+        if stage_name not in self.stages:
+            raise ValueError(f"Stage '{stage_name}' not found")
+
+        stage = self.stages[stage_name]
+        context = PipelineContext.create(config=self.config, dry_run=dry_run)
+
+        logger.info(f"Running stage '{stage_name}' independently")
+
+        try:
+            if not stage.validate_input(input_data):
+                raise ValueError(f"Invalid input for stage '{stage_name}'")
+
+            result = stage.execute(input_data, context)
+
+            logger.info(f"Stage '{stage_name}' completed successfully")
+            return result
+
+        except Exception as e:
+            logger.error(f"Stage '{stage_name}' failed: {e}")
+            raise
+
+    def _should_stop(self, data: Any, context: PipelineContext) -> bool:
+        """Determine if pipeline should stop early."""
+        # Stop if no data to process
+        if data is None or (isinstance(data, list) and len(data) == 0):
+            logger.info("No data to process, stopping pipeline")
+            return True
+
+        # Stop if too many errors
+        max_errors = 100  # Configurable threshold
+        if len(context.errors) > max_errors:
+            logger.error(f"Too many errors ({len(context.errors)}), stopping pipeline")
+            return True
+
+        return False
+
+    def _create_run_result(
+        self,
+        context: PipelineContext,
+        start_time: datetime,
+        end_time: datetime,
+        stages_completed: List[str],
+    ) -> PipelineRun:
+        """Create the pipeline run result."""
+        # Extract summary metrics from context
+        emails_processed = context.metrics.get("extract_emails_count", 0)
+        successful = context.metrics.get("load_success_count", 0)
+        failed = context.metrics.get("load_error_count", 0)
+
+        return PipelineRun(
+            run_id=context.run_id,
+            start_time=start_time,
+            end_time=end_time,
+            stages_completed=stages_completed,
+            emails_processed=emails_processed,
+            successful=successful,
+            failed=failed,
+            errors=context.errors,
+            metrics=context.metrics,
+        )
+
+    def get_stage_metrics(self) -> Dict[str, Dict[str, Any]]:
+        """Get metrics from all stages."""
+        metrics = {}
+        for name, stage in self.stages.items():
+            metrics[name] = stage.get_metrics()
+        return metrics
+
+    def reset_metrics(self):
+        """Reset metrics for all stages."""
+        for stage in self.stages.values():
+            stage.reset_metrics()
+        logger.info("Reset all stage metrics")

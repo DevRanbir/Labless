@@ -1,0 +1,121 @@
+# Local Pipeline Configuration for Gemini API
+
+paths:
+  database_file: ./email_pipeline.db
+  llm_log_file: ./llm_interactions.jsonl
+  error_log_file: ./categorization_errors.log
+  test_output_file: ./test_results.csv
+  test_summary_file: ./test_summary.json
+
+pipeline:
+  dry_run: false
+  continue_on_error: true
+  max_retries: 2
+
+  extract:
+    source: "gmail"
+    gmail_query: "in:inbox -label:\"Transaction\" -label:\"Action Required\" -label:\"Bills & Payments\" -label:\"Receipts & Invoices\" -label:\"Subscriptions\" -label:\"Promotions\" -label:\"Personal\" -label:\"Work\" -label:\"Alerts\" -label:\"Account & Security\" -label:\"Travel & Bookings\" -label:\"Events & Invitations\" -label:\"Spam / Low Priority\" -label:\"University\""
+    batch_size: 200
+    max_results: 200
+
+  transform:
+    llm_service: "groq"
+    model: "llama-3.1-8b-instant"
+    max_content_length: 6000
+    timeout: 60
+    skip_on_error: true
+
+    categories:
+      - "Action Required"
+      - "Bills & Payments"
+      - "Receipts & Invoices"
+      - "Subscriptions"
+      - "Promotions"
+      - "Personal"
+      - "Work"
+      - "Alerts"
+      - "Account & Security"
+      - "Travel & Bookings"
+      - "Events & Invitations"
+      - "Spam / Low Priority"
+      - "University"
+      - "Transaction"
+      - "Other :[One_Word_Description]"
+
+  load:
+    apply_labels: true
+    create_missing_labels: true
+
+    category_actions:
+      "Urgent / Action Required":
+        - "apply_label"
+        - "star"
+        - "mark_as_read"
+
+      "Follow-Up Needed":
+        - "apply_label"
+        - "star"
+        - "mark_as_read"
+
+      "Bills & Payments":
+        - "apply_label"
+        - "star"
+        - "mark_as_read"
+
+      "Receipts & Invoices":
+        - "apply_label"
+        - "mark_as_read"
+
+      "Subscriptions":
+        - "apply_label"
+        - "mark_as_read"
+
+      "Promotions & Marketing":
+        - "apply_label"
+        - "archive"
+        - "mark_as_read"
+
+      "Newsletters & Updates":
+        - "apply_label"
+        - "archive"
+        - "mark_as_read"
+
+      "Notifications & Alerts":
+        - "apply_label"
+        - "mark_as_read"
+
+      "Account & Security":
+        - "apply_label"
+        - "star"
+        - "mark_as_read"
+
+      "Travel & Bookings":
+        - "apply_label"
+        - "star"
+        - "mark_as_read"
+
+      "Events & Invitations":
+        - "apply_label"
+        - "mark_as_read"
+
+      "Spam / Low Priority":
+        - "apply_label"
+        - "archive"
+        - "mark_as_read"
+
+    default_actions:
+      - "apply_label"
+      - "mark_as_read"
+
+  sync:
+    database_path: "email_pipeline_gemini.db"
+    save_metrics: true
+    track_history: true
+    batch_size: 25
+    track_metrics: true
+
+  monitoring:
+    log_level: "INFO"
+    metrics_export: "json"
+    metrics_path: "pipeline_metrics_gemini.json"
+    enable_tracing: false

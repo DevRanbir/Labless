@@ -1,0 +1,35 @@
+# Example Configuration File for Labless
+# Copy this file to app-config.yaml and fill in your actual values
+
+# Groq API Configuration
+groq:
+  api_key: "YOUR_GROQ_API_KEY_HERE"
+  model: "llama-3.1-8b-instant"
+  rate_limit: 6000  # tokens per minute
+  wait_time: 1.5    # seconds between requests
+
+# Gmail Configuration
+gmail:
+  credentials_path: "src/main/resources/credentials.json"
+  token_path: "token.json"
+  
+# Database Configuration
+database:
+  path: "data/email_pipeline.db"
+
+# Email Categories
+categories:
+  - "Work"
+  - "Personal"
+  - "Finance"
+  - "Shopping"
+  - "Social"
+  - "Promotions"
+  - "Updates"
+  - "Spam"
+
+# Application Settings
+app:
+  theme: "dark"  # dark or light
+  auto_archive: true
+  batch_size: 50

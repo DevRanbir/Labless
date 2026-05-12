@@ -1,0 +1,21 @@
+llm:
+  provider: OpenAI
+  model: gpt-4o-mini
+  api_key: ""
+  endpoint: ""
+
+categories:
+  - Bills & Payments
+  - Personal
+  - Work
+  - Marketing
+  - Newsletters
+  - Low quality
+  - Notifications
+  - Other
+
+batch_size: 20
+gmail_query: "is:unread"
+database_path: "data/email_pipeline.db"
+dry_run: true
+onboarding_completed: false

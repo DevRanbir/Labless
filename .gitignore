@@ -1,0 +1,107 @@
+# ============================================
+# ROOT GITIGNORE - MAILLABLER PROJECT
+# ============================================
+
+# ---- SECRETS (NEVER COMMIT) ----
+credentials.json
+token.json
+client_secret*.json
+StoredCredential
+*.pem
+*.key
+*.p12
+.env
+.env.local
+.env.production
+**/config/app-config.yaml
+app-config.yaml
+
+# ---- USER DATA (PII) ----
+*.db
+*.sqlite
+*.sqlite3
+data/
+logs/
+*.log
+*.jsonl
+
+# ---- BUILD OUTPUTS ----
+target/
+build/
+dist/
+*.class
+*.jar
+!gradle-wrapper.jar
+*.war
+*.nar
+*.ear
+
+# ---- RELEASE ARTIFACTS (distributed separately, not in source) ----
+Labless-Portable/
+Labless-Setup*.msi
+*.exe
+*.msi
+*.dmg
+*.pkg
+*.deb
+*.rpm
+*.zip
+*.tar.gz
+*.rar
+
+# ---- TEMP BUILD DIRS (created by build-release.ps1) ----
+.build-input/
+.jpackage-out/
+.msi-out/
+.dist/
+
+# ---- TOOLS (downloaded, not source) ----
+.tools/
+
+# ---- PYTHON ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.venv
+*.egg-info/
+*.egg
+MANIFEST
+.pytest_cache/
+.coverage
+htmlcov/
+test_results.csv
+test_summary.json
+pipeline_metrics*.json
+*_local.json
+
+# ---- IDE ----
+.vscode/
+.idea/
+.kiro/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+*.swp
+*.swo
+*~
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# ---- MAVEN ----
+dependency-reduced-pom.xml
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar

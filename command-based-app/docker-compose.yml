@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  gmail-labeler:
+    build: .
+    container_name: gmail-llm-labeler
+    ports:
+      - "5000:5000"
+    volumes:
+      # Mount credentials and tokens
+      - ./credentials.json:/app/credentials.json:ro
+      - ./token.json:/app/token.json
+      # Mount .env file
+      - ./.env:/app/.env:ro
+      # Mount logs directory
+      - ./logs:/app/logs
+      # Mount database
+      - ./email_pipeline.db:/app/email_pipeline.db
+      - ./email_pipeline_gemini.db:/app/email_pipeline_gemini.db
+      # Mount metrics
+      - ./pipeline_metrics.json:/app/pipeline_metrics.json
+      - ./pipeline_metrics_gemini.json:/app/pipeline_metrics_gemini.json
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:5000/api/status')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
