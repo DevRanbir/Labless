@@ -1,6 +1,6 @@
 <!-- PROJECT IMAGE / BANNER -->
 <p align="center">
-  <img width="800" alt="Labless Logo" src="java-gui-mail-labeler/src/main/resources/logo.png" />
+  <img width="100%" alt="Labless Welcome Screen" src="Images/WelcomeScreen.png" />
 </p>
 
 # 🚀 Labless
@@ -30,6 +30,10 @@ What makes it unique:
 - **Portable Executable** – Download and run immediately with our bundled JRE releases.
 - **Smart Onboarding** – Simple OAuth2 flow to connect your Gmail safely.
 - **Detailed Progress** – Visual feedback for large-scale inbox processing jobs.
+
+<p align="center">
+  <img width="90%" alt="Labless Workspace" src="Images/MailsList.png" />
+</p>
 
 ---
 

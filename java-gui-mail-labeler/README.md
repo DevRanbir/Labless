@@ -1,6 +1,6 @@
 <!-- PROJECT IMAGE / BANNER -->
 <p align="center">
-  <img width="800" alt="Labless GUI" src="src/main/resources/logo.png" />
+  <img width="100%" alt="Labless GUI Banner" src="../Images/WelcomeScreen.png" />
 </p>
 
 # 🚀 Labless (Java GUI)
@@ -30,6 +30,11 @@ What makes it unique:
 - **Custom Categorization** – Define your own labels and let the AI learn your preferences.
 - **Local SQLite Storage** – Caches your inbox data locally for lightning-fast browsing.
 - **Auto-Installation** – Register the app in Windows Settings for easy management.
+
+<p align="center">
+  <img width="48%" alt="Labless Preview" src="../Images/MailPreview.png" />
+  <img width="48%" alt="Labless List" src="../Images/MailsList.png" />
+</p>
 
 ---
 
@@ -100,6 +105,10 @@ llm:
 * **Step 3:** Navigate to the "Workspace" to see your recent emails.
 * **Step 4:** Set up a "Labeling Job" by choosing target labels.
 * **Step 5:** Click "Start" and monitor the AI's categorization live.
+
+<p align="center">
+  <img width="90%" alt="Labless AI Processing" src="../Images/ActiveLabless.png" />
+</p>
 
 ---
 

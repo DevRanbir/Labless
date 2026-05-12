@@ -1,6 +1,6 @@
 <!-- PROJECT IMAGE / BANNER -->
 <p align="center">
-  <img width="800" alt="Labless CLI" src="templates/index.html" /> <!-- Placeholder for design reference -->
+  <img width="100%" alt="Labless Ecosystem" src="../Images/WelcomeScreen.png" />
 </p>
 
 # 🚀 Labless (Command-Based App)
