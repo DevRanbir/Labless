@@ -1,289 +1,132 @@
-# Labless
+<!-- PROJECT IMAGE / BANNER -->
+<p align="center">
+  <img width="800" alt="Labless GUI" src="src/main/resources/logo.png" />
+</p>
 
-**Intelligent Email Labeling Application Powered by AI**
+# 🚀 Labless (Java GUI)
 
-Labless is a modern JavaFX desktop application that automatically categorizes and labels your Gmail emails using AI. It features a beautiful dark-mode interface, intelligent email processing, and seamless Gmail integration.
-
-## Features
-
-### 🤖 AI-Powered Labeling
-- Automatic email categorization using Groq AI (llama-3.1-8b-instant)
-- Intelligent transaction detection for bank emails
-- Custom category support
-- Batch processing with rate limit handling
-
-### 📧 Gmail Integration
-- OAuth 2.0 authentication
-- Automatic label creation and application
-- Smart archiving for low-priority emails
-- Real-time sync with Gmail
-
-### 🎨 Modern UI
-- Clean, dark-mode interface
-- Three-column animated layout
-- Real-time progress tracking
-- Labeling history with database persistence
-- Corner flag unread indicators
-
-### ⚡ Smart Features
-- Auto-refresh every 2 minutes
-- User-configurable email count
-- Start/Stop controls
-- Batch processing (50 emails per batch)
-- Exponential backoff for rate limiting
-
-## Quick Start
-
-### For End Users (No Java Required)
-
-**Currently, a standalone .exe is not available due to JavaFX packaging limitations.**
-
-**To run Labless, you need:**
-1. Java 17+ installed ([Download here](https://www.oracle.com/java/technologies/downloads/))
-2. Download the project
-3. Run `run_labless.bat`
-
-**Quick Start:**
-```bash
-# Double-click or run:
-run_labless.bat
-```
-
-The launcher automatically finds Maven and starts the application.
-
-### For Developers
-
-#### Prerequisites
-- Java 17 or higher
-- Maven 3.6+
-- Gmail account
-- Groq API key (free at https://console.groq.com)
-
-#### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd java-gui-mail-labeler
-   ```
-
-2. **Run the application**
-   ```bash
-   mvn clean javafx:run
-   ```
-
-### First Time Setup
-
-1. **Choose Theme**: Select Dark Mode or System Default (Light mode is disabled)
-2. **Authenticate Gmail**: Connect your Google account via OAuth
-3. **Define Categories**: Choose from default categories or add custom ones
-4. **Configure AI**: Enter your Groq API key (get it from https://console.groq.com)
-
-### Default Categories
-
-**Personal:**
-- Account Security
-- Bills Payments
-- Receipts Invoices
-- Travel Bookings
-- Transaction
-
-**Work Related:**
-- University
-- Work
-- Action Required
-- Events Invitations
-- Certificates
-
-**Miscellaneous:**
-- Promotions
-- Subscriptions
-- Alerts
-- Notes
-- Spam / Low Priority
-
-## Usage
-
-### Labeling Emails
-
-1. Click the **sparkles icon** in the sidebar or top navigation
-2. Enter the number of emails to process (default: 100)
-3. Click **Start Labeling**
-4. Watch real-time progress and results
-5. Click **Stop** to interrupt at any time
-
-### Viewing History
-
-1. Click the **History** button in the top navigation
-2. View all previously labeled emails with:
-   - Subject and sender
-   - Applied category
-   - AI explanation
-   - Timestamp
-
-### Managing Labels
-
-- Labels are automatically created in Gmail
-- View labeled emails in the mail list
-- Archived emails are removed from inbox
-- Sync with Gmail using the refresh button
-
-## Configuration
-
-### Groq API
-- **Provider:** Groq (default)
-- **Model:** llama-3.1-8b-instant
-- **Rate Limit:** 6000 tokens/minute (free tier)
-- **Wait Time:** 1.5 seconds between requests
-
-### Auto-Refresh
-- **Interval:** 2 minutes
-- **Configurable in:** `MainApplication.java`
-
-### Email Processing
-- **Default count:** 100 emails
-- **Maximum count:** 10,000 emails
-- **Batch size:** 50 emails per batch
-- **Max retries:** 3 per email
-
-## Architecture
-
-### Technology Stack
-- **Framework:** JavaFX 21
-- **Build Tool:** Maven
-- **Database:** SQLite
-- **HTTP Client:** OkHttp 4.12.0
-
-## Building Release Executables
-
-### Quick Build
-
-Run the interactive build menu:
-```bash
-build-quick.bat
-```
-
-Choose from:
-1. **Windows Installer** - Professional .exe installer (~200 MB)
-2. **Portable App** - No installation required (~200 MB)
-3. **JAR File** - Requires Java 17+ (~50 MB)
-4. **Run Development** - Quick testing
-
-### Build Scripts
-
-#### Create Windows Installer:
-```bash
-build-exe.bat
-```
-Output: `target\installer\Labless-0.1.0.exe`
-
-#### Create Portable Application:
-```bash
-build-portable.bat
-```
-Output: `target\Labless-Portable\Labless.exe`
-
-#### Create JAR Only:
-```bash
-mvn clean package -DskipTests
-```
-Output: `target\labless-0.1.0-SNAPSHOT.jar`
-
-### Documentation
-- **[BUILD_RELEASE.md](BUILD_RELEASE.md)** - Complete build guide
-- **[BUILD_SUMMARY.md](BUILD_SUMMARY.md)** - Quick reference
-- **[RELEASE_NOTES.md](RELEASE_NOTES.md)** - Release documentation
-
-**Note:** Built executables include Java runtime - no Java installation required for end users!
-- **JSON:** Gson 2.10.1
-- **Gmail API:** Google API Client 2.2.0
-
-### Project Structure
-```
-src/main/java/com/labless/
-├── app/              # Application entry point
-├── ui/               # UI screens and components
-├── service/          # Business logic and API clients
-├── model/            # Data models
-├── database/         # Database management
-├── gmail/            # Gmail API integration
-└── processor/        # Email processing logic
-
-src/main/resources/
-├── styles/           # CSS stylesheets
-├── videos/           # Logo and loading videos
-└── icons/            # UI icons
-```
-
-## Features in Detail
-
-### Transaction Detection
-Emails are categorized as "Transaction" only if they meet ALL criteria:
-- From a bank (HDFC, ICICI, SBI, Axis, Kotak, Paytm, PhonePe, etc.)
-- Contains transaction keywords (debited, credited, withdrawn, deposited)
-- NOT promotional (no offers, rewards, cashback, etc.)
-
-Otherwise, they're categorized as "Bills & Payments"
-
-### Rate Limiting
-- Automatic retry with exponential backoff
-- Up to 3 retries per email
-- Smart wait time parsing from API errors
-- Graceful degradation after max retries
-
-### State Persistence
-- All UI components are instance variables
-- State persists when navigating away
-- Progress continues in background
-- No UI/thread desynchronization
-
-## Troubleshooting
-
-### Rate Limit Errors
-**Solution:** Increase wait time to 15 seconds or process fewer emails
-
-### Labels Not Showing
-**Solution:** Click refresh button or check Gmail web interface
-
-### All Emails Show as Unread
-**Solution:** Check Gmail - they may actually be unread. Click refresh to sync.
-
-### Configuration Not Loading
-**Solution:** Rerun onboarding or check `config/app-config.yaml`
-
-## Documentation
-
-- **Complete Improvements:** See [IMPROVEMENTS.md](IMPROVEMENTS.md) for detailed feature documentation
-- **Quick Start Guide:** See [QUICK_START_GUIDE.md](QUICK_START_GUIDE.md) for step-by-step instructions
-
-## Development
-
-### Building
-```bash
-mvn clean compile
-```
-
-### Running Tests
-```bash
-mvn test
-```
-
-### Packaging
-```bash
-mvn package
-```
-
-## License
-
-[Add your license here]
-
-## Credits
-
-- **AI Provider:** Groq (https://groq.com)
-- **Email API:** Gmail API
-- **Framework:** JavaFX
+> Premium JavaFX desktop client for the Labless ecosystem, providing a high-performance, visual interface for AI-powered email organization.
 
 ---
 
-**Labless** - Making email management effortless with AI
+## 📖 Description
 
+The Labless Java GUI is the flagship interface for the Labless project. It combines the power of Java 17+ and JavaFX to deliver a smooth, interactive experience. Designed with a focus on usability, it allows users to manage their Gmail inbox using state-of-the-art AI models with zero command-line knowledge required.
+
+What makes it unique:
+- **Beautiful UI** – Custom CSS-driven dark mode with glassmorphism elements.
+- **Embedded JRE** – Runs as a standalone `.exe` without requiring Java installation.
+- **Direct Gmail Integration** – Uses official Google OAuth2 for maximum security.
+- **Visual Progress Tracking** – Watch AI process your emails with real-time charts and logs.
+- **Configurable LLMs** – Hot-swap between Groq, OpenAI, and local mock services.
+
+---
+
+## ✨ Features
+
+- **OAuth2 Onboarding** – Securely link your Gmail account with one click.
+- **Smart Workspace** – Multi-column layout for easy navigation of your inbox.
+- **Batch Processing** – Label thousands of emails in minutes using Groq's high-speed API.
+- **Custom Categorization** – Define your own labels and let the AI learn your preferences.
+- **Local SQLite Storage** – Caches your inbox data locally for lightning-fast browsing.
+- **Auto-Installation** – Register the app in Windows Settings for easy management.
+
+---
+
+## 🧠 Tech Stack
+
+**Frontend & Core**
+- Java 17+
+- JavaFX 21 (Graphics, Controls, FXML)
+- CSS3 (Custom Styling)
+
+**Integrations**
+- Google Gmail API v1
+- Google OAuth2 Client
+- Jackson / SnakeYAML (Config)
+
+**Data & Build**
+- SQLite (via JDBC)
+- Maven
+- jpackage / WiX Toolset
+
+---
+
+## 🏗️ Architecture / Workflow
+
+```text
+Main Application → Onboarding (OAuth) → Workspace → Processor Service → LLM API → Database Update
+```
+
+---
+
+## ⚙️ Installation & Setup
+
+```bash
+# Navigate to the GUI project
+cd java-gui-mail-labeler
+
+# Ensure you have Maven installed
+mvn clean compile
+
+# Run the application
+mvn javafx:run
+```
+
+*Note: For a production build, use the `build-release.ps1` script in the root directory.*
+
+---
+
+## 🔐 Configuration
+
+Create `config/app-config.yaml` from the example:
+
+```yaml
+gmail:
+  applicationName: "Labless"
+  tokensDirectoryPath: "tokens"
+llm:
+  serviceType: "GROQ" # Options: GROQ, OPENAI, MOCK
+  apiKey: "your-api-key"
+  modelName: "llama-3.1-8b-instant"
+```
+
+---
+
+## 🧪 Usage
+
+* **Step 1:** Place your `credentials.json` (from Google Cloud Console) in `src/main/resources/`.
+* **Step 2:** Start the app and complete the Google login in your browser.
+* **Step 3:** Navigate to the "Workspace" to see your recent emails.
+* **Step 4:** Set up a "Labeling Job" by choosing target labels.
+* **Step 5:** Click "Start" and monitor the AI's categorization live.
+
+---
+
+## 📂 Project Structure
+
+```text
+java-gui-mail-labeler/
+├── src/main/java/com/labless/
+│   ├── app/          # Entry point
+│   ├── ui/           # JavaFX Screens (Welcome, Workspace, etc.)
+│   ├── gmail/        # API Clients
+│   └── processor/    # Logic for labeling
+├── src/main/resources/
+│   ├── styles/       # App CSS
+│   └── videos/       # UI Animations
+└── pom.xml           # Project dependencies
+```
+
+---
+
+## 👥 Team / Author
+
+* **Name:** DevRanbir
+* **GitHub:** [https://github.com/DevRanbir](https://github.com/DevRanbir)
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License.

@@ -1,263 +1,155 @@
-# Labless - AI-Powered Email Labeling
+<!-- PROJECT IMAGE / BANNER -->
+<p align="center">
+  <img width="800" alt="Labless Logo" src="java-gui-mail-labeler/src/main/resources/logo.png" />
+</p>
 
-**Intelligent Email Management Made Simple**
+# 🚀 Labless
 
-Labless is a desktop application that automatically categorizes and labels your Gmail emails using AI. Choose between a modern JavaFX GUI or a command-line interface.
-
-## 📁 Project Structure
-
-This repository contains two implementations:
-
-### 1. **Labless GUI** (Recommended)
-**Location:** `java-gui-mail-labeler/`
-
-Modern JavaFX desktop application with:
-- Beautiful dark-mode interface
-- Real-time progress tracking
-- Labeling history
-- Auto-refresh every 2 minutes
-- User-friendly onboarding
-
-**Quick Start:**
-```bash
-cd java-gui-mail-labeler
-mvn clean javafx:run
-```
-
-**Documentation:** See [java-gui-mail-labeler/README.md](java-gui-mail-labeler/README.md)
-
-### 2. **Command-Based App** (Legacy)
-**Location:** `command-based-app/`
-
-Python-based command-line tool for email labeling.
-
-**Quick Start:**
-```bash
-cd command-based-app
-python label_transactions.py
-```
-
-**Documentation:** See [command-based-app/README.md](command-based-app/README.md)
-
-## � Security First
-
-**Before cloning or contributing, please read:**
-- 📖 [SECURITY.md](SECURITY.md) - Security guidelines and best practices
-- 🚀 [SAFE_GIT_INIT.md](SAFE_GIT_INIT.md) - Safe git initialization guide
-- ⚙️ [SETUP.md](java-gui-mail-labeler/SETUP.md) - Secure setup instructions
-
-**Quick Security Check:**
-```bash
-# Run before committing
-verify-security.bat
-```
-
-**Protected Files (Never Commit):**
-- ✅ `credentials.json` - OAuth secrets
-- ✅ `token.json` - User tokens
-- ✅ `app-config.yaml` - API keys
-- ✅ `*.db` - User data
-- ✅ `.env` - Environment variables
-
-## �🚀 Features
-
-### AI-Powered Categorization
-- Automatic email labeling using Groq AI
-- Intelligent transaction detection
-- Custom category support
-- Batch processing
-
-### Gmail Integration
-- OAuth 2.0 authentication
-- Automatic label creation
-- Smart archiving
-- Real-time sync
-
-### Smart Processing
-- Rate limit handling with exponential backoff
-- User-configurable email count
-- Background processing
-- State persistence
-
-## 🎯 Quick Start (GUI)
-
-1. **Prerequisites**
-   - Java 17+
-   - Maven 3.6+
-   - Gmail account
-   - Groq API key (free at https://console.groq.com)
-
-2. **Run**
-   ```bash
-   cd java-gui-mail-labeler
-   mvn clean javafx:run
-   ```
-
-3. **Setup**
-   - Choose theme (Dark Mode recommended)
-   - Connect Gmail account
-   - Define categories
-   - Enter Groq API key
-
-4. **Start Labeling**
-   - Click sparkles icon
-   - Enter email count
-   - Click "Start Labeling"
-   - Watch the magic happen!
-
-## 📊 Default Categories
-
-**Personal:**
-- Account Security
-- Bills Payments
-- Receipts Invoices
-- Travel Bookings
-- Transaction
-
-**Work Related:**
-- University
-- Work
-- Action Required
-- Events Invitations
-- Certificates
-
-**Miscellaneous:**
-- Promotions
-- Subscriptions
-- Alerts
-- Notes
-- Spam / Low Priority
-
-## 🎨 Screenshots
-
-### Main Interface
-- Three-column layout with smooth animations
-- Corner flag unread indicators
-- Real-time email list updates
-
-### Labeling Panel
-- Progress tracking
-- Results display with AI explanations
-- Start/Stop controls
-
-### History View
-- Table view of all labeled emails
-- Category badges
-- Timestamps and explanations
-
-## 🔧 Configuration
-
-### Groq API (Default)
-- **Model:** llama-3.1-8b-instant
-- **Rate Limit:** 6000 tokens/minute (free tier)
-- **Get API Key:** https://console.groq.com
-
-### Auto-Refresh
-- **Interval:** 2 minutes
-- **Configurable:** Yes
-
-### Processing
-- **Default:** 100 emails
-- **Maximum:** 10,000 emails
-- **Batch Size:** 50 emails
-
-## 📚 Documentation
-
-### GUI Application
-- [README](java-gui-mail-labeler/README.md) - Complete guide
-- [IMPROVEMENTS](java-gui-mail-labeler/IMPROVEMENTS.md) - Detailed feature documentation
-- [QUICK_START_GUIDE](java-gui-mail-labeler/QUICK_START_GUIDE.md) - Step-by-step tutorial
-
-### Command-Based App
-- [README](command-based-app/README.md) - Python CLI guide
-- [DEPLOYMENT](command-based-app/DEPLOYMENT.md) - Deployment instructions
-- [CONFIGURATION](command-based-app/docs/CONFIGURATION.md) - Configuration guide
-
-## 🛠️ Technology Stack
-
-### GUI Application
-- **Framework:** JavaFX 21
-- **Build:** Maven
-- **Database:** SQLite
-- **HTTP:** OkHttp 4.12.0
-- **JSON:** Gson 2.10.1
-- **Gmail API:** Google API Client 2.2.0
-
-### Command-Based App
-- **Language:** Python 3.8+
-- **Framework:** Flask (web interface)
-- **Database:** SQLite
-- **Gmail API:** google-api-python-client
-
-## 🎯 Use Cases
-
-### Personal Email Management
-- Automatically categorize bills and receipts
-- Track bank transactions
-- Organize travel bookings
-- Filter promotions and subscriptions
-
-### Work Email Organization
-- Separate work from personal
-- Track action items
-- Organize events and invitations
-- Manage university communications
-
-### Inbox Zero
-- Auto-archive low-priority emails
-- Smart categorization
-- Quick email triage
-- Maintain organized inbox
-
-## 🔒 Security & Privacy
-
-- **OAuth 2.0:** Secure Gmail authentication
-- **Local Storage:** All data stored locally
-- **No Data Sharing:** Your emails never leave your machine
-- **API Keys:** Stored in local configuration files
-- **Open Source:** Transparent and auditable code
-
-## 🚧 Troubleshooting
-
-### Rate Limit Errors
-Increase wait time or process fewer emails at once
-
-### Labels Not Showing
-Click refresh button or check Gmail web interface
-
-### Configuration Issues
-Rerun onboarding or check config files
-
-### Video Not Playing
-Ensure video files exist in resources folder
-
-## 🤝 Contributing
-
-Contributions are welcome! Please:
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-## 📝 License
-
-[Add your license here]
-
-## 🙏 Credits
-
-- **AI Provider:** Groq (https://groq.com)
-- **Email API:** Gmail API
-- **Framework:** JavaFX & Python Flask
+> AI-powered intelligent email labeling and organization platform designed to automate your inbox workflow and eliminate manual sorting.
 
 ---
 
-## 🎬 Getting Started
+## 📖 Description
 
-**Recommended:** Start with the GUI application for the best experience!
+Labless is an innovative productivity application that uses Large Language Models (LLMs) to automatically categorize and label your emails. By analyzing your inbox in real-time, it identifies transactions, bills, personal messages, and more, allowing you to focus on what matters while the AI handles the organization.
 
+What makes it unique:
+- **Intelligent Categorization** – Uses LLMs (Groq/Llama) to understand context, not just keywords.
+- **Cross-Platform Support** – Available as a sleek JavaFX GUI or a robust Python CLI.
+- **Privacy-First** – Processes data locally where possible; your login tokens never leave your machine.
+- **Portable Design** – Self-contained Windows release that runs without needing a pre-installed Java Runtime.
+- **Real-time Feedback** – Monitor labeling progress and AI reasoning live.
+
+---
+
+## ✨ Features
+
+- **AI Email Labeling** – Practice zero-touch inbox management with AI-driven categorization.
+- **Transaction Detection** – Automatically identifies and tags financial transactions and receipts.
+- **Multi-Model Support** – Connect with Groq, OpenAI, or local Ollama instances.
+- **Portable Executable** – Download and run immediately with our bundled JRE releases.
+- **Smart Onboarding** – Simple OAuth2 flow to connect your Gmail safely.
+- **Detailed Progress** – Visual feedback for large-scale inbox processing jobs.
+
+---
+
+## 🧠 Tech Stack
+
+**Java GUI App**
+- Java 17+ / JavaFX
+- Google Gmail API
+- Groq / LLM Integration
+- SQLite (Local Cache)
+- Maven (Build System)
+
+**Command-Based App**
+- Python 3.10+
+- Flask (Web Interface)
+- SQLAlchemy / SQLite
+- Ollama / OpenAI Integration
+- Docker Support
+
+**Deployment**
+- GitHub Releases
+- WiX Toolset (MSI Installers)
+
+---
+
+## 🏗️ Architecture / Workflow
+
+```text
+Gmail API → Fetch Inbox → Transaction Detection → LLM Categorization → Apply Labels → Update Local Cache
+```
+
+---
+
+## ⚙️ Installation & Setup
+
+### Java GUI (Recommended)
 ```bash
-cd java-gui-mail-labeler
+# Clone the repository
+git clone https://github.com/DevRanbir/Labless.git
+
+# Navigate to project
+cd Labless/java-gui-mail-labeler
+
+# Build and Run
 mvn clean javafx:run
 ```
 
-**Labless** - Making email management effortless with AI ✨
+### Command-Based App
+```bash
+# Navigate to project
+cd Labless/command-based-app
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Start Web Server
+python web_app.py
+```
+
+---
+
+## 🔐 Environment Variables / Configuration
+
+For the Java GUI, place your `credentials.json` in `src/main/resources/` and create an `app-config.yaml` in the root.
+
+For the Python app, create a `.env` file:
+```env
+LLM_SERVICE=Ollama
+DATABASE_PATH=email_pipeline.db
+OLLAMA_BASE_URL=http://localhost:11434/v1
+```
+
+---
+
+## 🧪 Usage
+
+* **Step 1:** Connect your Gmail account via the secure OAuth onboarding.
+* **Step 2:** Select the folders or labels you want the AI to monitor.
+* **Step 3:** Choose your preferred AI model (Groq is recommended for speed).
+* **Step 4:** Start the "Labeling Job" and watch your inbox get organized.
+* **Step 5:** Review the AI's reasoning for each label directly in the app.
+
+---
+
+## 🎥 Demo
+
+* **Download Portable Release:** [Releases Page](https://github.com/DevRanbir/Labless/releases)
+
+---
+
+## 📂 Project Structure
+
+```text
+Labless/
+├── java-gui-mail-labeler/    # Premium JavaFX Desktop Application
+├── command-based-app/        # Python CLI and Flask Web Interface
+├── Labless-Portable/         # Bundled standalone Windows release
+├── build-release.ps1         # Automation script for building releases
+└── README.md                 # Root documentation
+```
+
+---
+
+## 🚧 Future Improvements
+
+- [ ] Add support for Outlook / Office 365
+- [ ] Implement local-only LLM processing for 100% privacy
+- [ ] Add advanced search with natural language queries
+- [ ] Create a mobile companion app
+- [ ] Add multi-account support
+
+---
+
+## 👥 Team / Author
+
+* **Name:** DevRanbir
+* **GitHub:** [https://github.com/DevRanbir](https://github.com/DevRanbir)
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License.

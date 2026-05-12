@@ -1,354 +1,138 @@
-# Gmail LLM Labeler
+<!-- PROJECT IMAGE / BANNER -->
+<p align="center">
+  <img width="800" alt="Labless CLI" src="templates/index.html" /> <!-- Placeholder for design reference -->
+</p>
 
-An intelligent Gmail email labeling system that uses Large Language Models (LLMs) to automatically categorize and label emails.
+# 🚀 Labless (Command-Based App)
 
-## Prerequisites
+> Flexible Python-based CLI and Web interface for the Labless ecosystem, optimized for power users and automation pipelines.
 
-Before you begin, you'll need:
+---
 
-1. **Python 3.8+** installed
-2. **Gmail account** with access to Gmail API
-3. **LLM provider** - choose one:
-   - OpenAI API key (requires paid account)
-   - Gemini API key (Google AI Studio / Vertex AI)
-   - Groq API key
-   - Ollama installed locally (free, runs on your machine)
-4. **Google Cloud Project** with Gmail API enabled (see setup below)
+## 📖 Description
 
-## Installation
+The Labless Command-Based App is a versatile Python implementation designed for flexibility and ease of integration. Whether you prefer a terminal-based workflow or a lightweight web dashboard, this module provides the tools to orchestrate complex email labeling tasks using local or cloud-based AI.
 
-### For Development
+What makes it unique:
+- **Ollama Integration** – Full support for running local models (like `gpt-oss`) for 100% private processing.
+- **Flask Web UI** – A minimalist web interface to monitor and trigger pipelines.
+- **Pipeline Orchestrator** – A modular stage-based system (Extract → Transform → Load).
+- **Docker Ready** – Containerized support for easy deployment on servers or NAS.
+- **CLI Power** – Granular control over processing batches and model parameters.
+
+---
+
+## ✨ Features
+
+- **Local LLM Support** – Connect seamlessly with Ollama for zero-cost, private labeling.
+- **Modular Pipeline** – Customizable stages for syncing, transforming, and loading email data.
+- **Web Dashboard** – Monitor metrics and trigger syncs from any browser.
+- **Docker Compose** – Spin up the entire stack (App + DB) with a single command.
+- **SQLAlchemy Backend** – Robust database management for millions of email records.
+- **Extensible Factory** – Easily add new LLM providers or email services.
+
+---
+
+## 🧠 Tech Stack
+
+**Backend & CLI**
+- Python 3.10+
+- SQLAlchemy (ORM)
+- Pandas (Data Processing)
+- Click (CLI Framework)
+
+**Web Interface**
+- Flask
+- Jinja2 Templates
+- Bootstrap 5
+
+**DevOps**
+- Docker & Docker Compose
+- Pytest (Testing)
+
+---
+
+## 🏗️ Architecture / Workflow
+
+```text
+CLI/Web → Orchestrator → Sync Stage → Transform (AI) Stage → Load (DB) Stage → Metrics
+```
+
+---
+
+## ⚙️ Installation & Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/ColeMurray/gmail-llm-labeler.git
-cd gmail-llm-labeler
+# Navigate to the Python project
+cd command-based-app
 
-# Create virtual environment
+# Create a virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # Or venv\Scripts\activate on Windows
 
-# Install in editable mode with development dependencies
-pip install -e ".[dev]"
+# Install dependencies
+pip install -e .
+
+# Run the web server
+./start_web_server.bat
 ```
 
-### For Production
+---
 
-```bash
-# Install package
-pip install .
+## 🔐 Environment Variables
 
-# Or with optional Ollama support
-pip install ".[ollama]"
-```
-
-## Gmail API Setup
-
-To access your Gmail account, you need to create OAuth 2.0 credentials in Google Cloud Platform.
-
-### Step 1: Create a Google Cloud Project
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Click **Select a project** → **New Project**
-3. Enter a project name (e.g., "Gmail LLM Labeler")
-4. Click **Create**
-
-### Step 2: Enable Gmail API
-
-1. In your project, go to **APIs & Services** → **Library**
-2. Search for "Gmail API"
-3. Click on **Gmail API**
-4. Click **Enable**
-
-### Step 3: Configure OAuth Consent Screen
-
-1. Go to **APIs & Services** → **OAuth consent screen**
-2. Choose **External** (unless you have a Google Workspace)
-3. Click **Create**
-4. Fill in the required fields:
-   - **App name**: Gmail LLM Labeler
-   - **User support email**: Your email
-   - **Developer contact email**: Your email
-5. Click **Save and Continue**
-6. **Scopes**: Click **Add or Remove Scopes**
-   - Search and add: `https://www.googleapis.com/auth/gmail.modify`
-   - This allows reading and modifying labels
-7. Click **Save and Continue**
-8. **Test users**: Add your Gmail address
-9. Click **Save and Continue**
-
-### Step 4: Create OAuth Client ID
-
-1. Go to **APIs & Services** → **Credentials**
-2. Click **Create Credentials** → **OAuth client ID**
-3. Choose **Application type**: Desktop app
-4. **Name**: Gmail LLM Labeler
-5. Click **Create**
-6. Click **Download JSON** - save this as `credentials.json` in your project root
-7. Click **OK**
-
-### Step 5: First Run Authentication
-
-The first time you run the application, it will:
-
-1. Open your browser for authentication
-2. Ask you to sign in to Google
-3. Show a warning "Google hasn't verified this app" - click **Continue** (safe, it's your app)
-4. Grant permissions to modify Gmail
-5. Generate a `token.json` file for future runs
-
-**Note**: Both `credentials.json` and `token.json` are already in `.gitignore` and will never be committed.
-
-## Configuration
-
-Create a `.env` file in the project root with your LLM provider settings:
-
-### Option A: Using OpenAI
+Create a `.env` file in the `command-based-app` directory:
 
 ```env
-OPENAI_API_KEY=your_openai_api_key_here
+LLM_SERVICE=Ollama  # Options: Ollama, OpenAI, Gemini, Groq
+DATABASE_PATH=email_pipeline.db
+OLLAMA_BASE_URL=http://localhost:11434/v1
+OLLAMA_MODEL=llama3
 ```
 
-### Option B: Using Ollama (Local)
+---
 
-```env
-OLLAMA_HOST=http://localhost:11434
-OLLAMA_MODEL=gpt-oss:20b
+## 🧪 Usage
+
+* **Step 1:** Configure your `.env` file with your preferred LLM service.
+* **Step 2:** Run `python label_transactions.py` to start the CLI pipeline.
+* **Step 3:** (Optional) Launch the web UI using `python web_app.py`.
+* **Step 4:** Visit `http://localhost:5000` to view processing metrics.
+* **Step 5:** Use the CLI to schedule recurring sync jobs.
+
+---
+
+## 📂 Project Structure
+
+```text
+command-based-app/
+├── email_labeler/       # Core package
+│   ├── pipeline/        # Stage implementations (Extract/Transform/Load)
+│   └── database.py      # SQLAlchemy models
+├── templates/           # Flask Web UI
+├── examples/            # Sample configurations
+├── Dockerfile           # Container definition
+└── web_app.py           # Flask entry point
 ```
 
-### Option C: Using Gemini API
+---
 
-```env
-LLM_SERVICE=Gemini
-GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_MODEL=gemini-2.5-flash
-```
+## 🚧 Future Improvements
 
-### Option D: Using Groq API
+- [ ] Add support for LangChain for complex multi-step reasoning
+- [ ] Implement a REST API for remote control
+- [ ] Add more sophisticated data visualization in the Web UI
+- [ ] Support for multiple email backends (IMAP/POP3)
 
-```env
-LLM_SERVICE=Groq
-GROQ_API_KEY=your_groq_api_key_here
-GROQ_MODEL=llama-3.1-8b-instant
-```
+---
 
-> **Note**: The `credentials.json` file handles Gmail authentication. You don't need to set `GOOGLE_CLIENT_ID` or `GOOGLE_CLIENT_SECRET` in `.env`.
+## 👥 Team / Author
 
-### Advanced Configuration
+* **Name:** DevRanbir
+* **GitHub:** [https://github.com/DevRanbir](https://github.com/DevRanbir)
 
-For detailed configuration options including file paths, YAML configuration, and platform-specific defaults, see [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
+---
 
-## Usage
+## 📜 License
 
-### Web Interface (Recommended)
-
-The easiest way to use the Gmail LLM Labeler is through the web interface:
-
-```bash
-# Windows
-start_web_server.bat
-
-# Linux/Mac
-chmod +x start_web_server.sh
-./start_web_server.sh
-```
-
-Then open your browser to: **http://localhost:5000**
-
-**Features:**
-- 🚀 Start labeling jobs with one click
-- 📊 Real-time job monitoring
-- 📜 Live log viewing
-- 📈 Metrics dashboard
-- ⚙️ Configure job parameters
-- 🔄 View job history
-
-### Command Line Interface
-
-After installation, use the `gmail-pipeline` command:
-
-```bash
-# Show available commands
-gmail-pipeline --help
-
-# Run the complete pipeline
-gmail-pipeline run
-
-# Run with a custom config file
-gmail-pipeline run --config examples/pipeline_config_local.yaml
-
-# Run in dry-run mode (no changes)
-gmail-pipeline run --dry-run
-
-# Run in preview mode
-gmail-pipeline run --preview
-
-# Show metrics from last run
-gmail-pipeline show-metrics
-
-# Validate configuration file
-gmail-pipeline validate-config examples/pipeline_config_local.yaml
-
-# Generate a sample configuration
-gmail-pipeline generate-config --output my_config.yaml
-```
-
-## Testing
-
-Run the test suite:
-
-```bash
-# Run all tests with coverage
-pytest
-
-# Run specific test file
-pytest tests/test_database.py
-
-# Run with verbose output
-pytest -v
-
-# Run only unit tests
-pytest -m unit
-
-# Run only integration tests
-pytest -m integration
-```
-
-## Project Structure
-
-```
-gmail-llm-labeler/
-├── email_labeler/               # Main package
-│   ├── __init__.py
-│   ├── database.py              # Database operations
-│   ├── email_processor.py       # Gmail API operations
-│   ├── factory.py               # Factory functions
-│   ├── gmail_utils.py           # Gmail utility functions
-│   ├── labeler.py               # Main labeling logic
-│   ├── llm_service.py           # LLM service interface
-│   ├── metrics.py               # Metrics tracking
-│   └── pipeline/                # ETL pipeline module
-│       ├── __init__.py
-│       ├── base.py              # Base classes
-│       ├── cli.py               # Command-line interface
-│       ├── config.py            # Configuration
-│       ├── extract_stage.py     # Extract stage
-│       ├── load_stage.py        # Load stage
-│       ├── orchestrator.py      # Pipeline orchestrator
-│       ├── sync_stage.py        # Sync stage
-│       └── transform_stage.py   # Transform stage
-├── tests/                       # Test suite
-│   ├── conftest.py              # Shared fixtures
-│   ├── test_cli.py
-│   ├── test_database.py
-│   ├── test_email_processor.py
-│   ├── test_factory.py
-│   ├── test_labeler.py
-│   ├── test_llm_service.py
-│   ├── test_pipeline_orchestrator.py
-│   └── test_pipeline_stages.py
-├── docs/                        # Documentation
-│   └── CONFIGURATION.md         # Configuration guide
-├── examples/                    # Example configurations
-│   ├── example_config.yaml      # Example pipeline config
-│   └── pipeline_config_local.yaml  # Local development config
-├── pyproject.toml               # Project configuration
-├── setup.py                     # Setup script
-├── pytest.ini                   # Pytest configuration
-└── README.md                    # This file
-```
-
-## Features
-
-- **Gmail Integration**: Fetches emails directly from Gmail using the Gmail API
-- **Transaction Auto-Labeling**: Fast rule-based detection of bank/payment transaction emails
-- **LLM Categorization**: Uses OpenAI GPT, Groq, Gemini, or Ollama for intelligent email categorization
-- **Automatic Labeling**: Applies Gmail labels based on categories
-- **ETL Pipeline**: Robust Extract-Transform-Load pipeline for batch processing
-- **Database Tracking**: SQLite database for tracking processed emails
-- **Metrics & Monitoring**: Built-in metrics tracking and reporting
-- **Dry Run Mode**: Test categorization without applying labels
-- **Comprehensive Testing**: Full test suite with pytest
-
-## Transaction Email Labeling
-
-The system includes a fast, rule-based transaction email detector specifically for **Axis Bank** transaction alerts. This runs before the LLM pipeline to save time and API costs.
-
-### What Gets Labeled as "Transaction"
-
-**Axis Bank transaction alerts only:**
-- Credit/debit notifications from `alerts@axis.bank.in`
-- Account transaction summaries
-- UPI transaction confirmations
-- Balance update alerts
-
-**Detection Requirements (all must match):**
-1. ✅ From Axis Bank sender (`alerts@axis.bank.in` or `notification@axis.bank.in`)
-2. ✅ Subject contains transaction keywords (credited/debited/INR amount)
-3. ✅ Body contains transaction details (account number, transaction info, date/time)
-
-### How It Works
-
-1. **Sender Verification**: Must be from Axis Bank alerts
-2. **Subject Check**: Must mention credit/debit/amount
-3. **Body Verification**: Must contain transaction details
-4. **Label Cleanup**: Removes all existing custom labels from matched emails
-5. **Transaction Label**: Applies the "Transaction" label
-6. **System Labels Preserved**: Keeps INBOX, STARRED, UNREAD, etc.
-
-### Running the Complete Workflow
-
-The main batch file now runs both transaction labeling and LLM categorization:
-
-```bash
-# Windows
-run_labless.bat
-
-# Or manually:
-python label_transactions.py --query "from:alerts@axis.bank.in"
-python -m email_labeler.pipeline.cli run --config examples/pipeline_config_gemini.yaml
-```
-
-### Transaction Labeler Options
-
-```bash
-# Default: Axis Bank alerts only
-python label_transactions.py
-
-# Test without making changes
-python label_transactions.py --limit 10 --dry-run
-
-# Specific date range
-python label_transactions.py --query "from:alerts@axis.bank.in after:2024/01/01"
-
-# Verbose logging
-python label_transactions.py --verbose
-```
-
-### Adding Other Banks
-
-To add support for other banks, edit `label_transactions.py` and add patterns to `TRANSACTION_PATTERNS`:
-
-```python
-"axis_bank_senders": [
-    r"(?i)alerts?@axis\.bank\.in",
-    r"(?i)alerts?@hdfcbank\.com",  # Add HDFC
-    r"(?i)alerts?@icicibank\.com",  # Add ICICI
-],
-```
-
-### Configuration
-
-Edit `run_labless.bat` to adjust settings:
-
-```batch
-set "TRANSACTION_LIMIT=500"  :: Max transaction emails to process
-set "LIMIT=200"              :: Max emails for LLM pipeline
-set "SAVE_EVERY=40"          :: Save progress interval
-```
-
-The pipeline config (`examples/pipeline_config_gemini.yaml`) automatically excludes emails already labeled as "Transaction" to avoid duplicate processing.
-
-## License
-
-MIT
+This project is licensed under the MIT License.
